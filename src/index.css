@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+/* Global Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Root Defaults */
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Body Styling */
+body {
+  margin: 0;
+  min-width: 320px;
+
+  background-color: #09090b;
+  color: white;
+
+  font-family: Inter, sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Images */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Inputs */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+}
+
+/* Remove Mobile Tap Highlight */
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Text Overflow Protection */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #18181b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
+
+/* Selection */
+::selection {
+  background: #10b981;
+  color: white;
+}

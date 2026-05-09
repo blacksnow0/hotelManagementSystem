@@ -1,0 +1,130 @@
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  where
+} from "firebase/firestore";
+
+import { db } from "../firebase/firebase";
+
+import getTodayDate from "../utils/getTodayDate";
+
+export async function createBooking(
+  bookingData
+) {
+  const bookingsRef = collection(
+    db,
+    "bookings"
+  );
+
+  await addDoc(bookingsRef, {
+    ...bookingData,
+
+    status: "pending_assignment",
+
+    createdAt: serverTimestamp(),
+  });
+}
+
+
+export function listenToBookings(
+  callback
+) {
+  const bookingsRef = collection(
+    db,
+    "bookings"
+  );
+
+  const q = query(
+    bookingsRef,
+    orderBy("createdAt", "desc")
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const bookings = snapshot.docs.map(
+      (doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })
+    );
+
+    callback(bookings);
+  });
+}
+
+export function listenToHotelBookings(
+  hotelId,
+  callback
+) {
+
+  const today = getTodayDate();
+
+  const bookingsRef = collection(
+    db,
+    "bookings"
+  );
+
+  const q = query(
+    bookingsRef,
+
+    where("hotelId", "==", hotelId),
+
+    where(
+      "status",
+      "==",
+      "pending_assignment"
+    ),
+    where(
+      "checkInDate",
+      "==",
+      today
+    ),
+
+    orderBy("createdAt", "desc")
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const bookings = snapshot.docs.map(
+      (doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })
+    );
+
+    callback(bookings);
+  });
+}
+
+export function listenToCheckedInBookings(
+  hotelId,
+  callback
+) {
+  const bookingsRef = collection(
+    db,
+    "bookings"
+  );
+
+  const q = query(
+    bookingsRef,
+
+    where("hotelId", "==", hotelId),
+
+    where("status", "==", "checked_in"),
+
+    orderBy("createdAt", "desc")
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const bookings = snapshot.docs.map(
+      (doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })
+    );
+
+    callback(bookings);
+  });
+}
