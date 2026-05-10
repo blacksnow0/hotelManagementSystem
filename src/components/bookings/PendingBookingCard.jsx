@@ -1,80 +1,169 @@
-import useAvailableRooms from "../../hooks/useAvailableRooms";
+import { useState } from "react";
 
-import { assignRoom } from "../../services/roomService";
+import {
+  BedDouble,
+  ChevronRight,
+  Users,
+} from "lucide-react";
+
+import RoomAllocationModal from "./RoomAllocationModal";
 
 export default function PendingBookingCard({
   booking,
 }) {
-  const rooms = useAvailableRooms(
-    booking.hotelId
-  );
+  const [openAllocation, setOpenAllocation] =
+    useState(false);
 
-  async function handleAssign(roomId) {
-    try {
-      await assignRoom({
-        roomId,
+  const assignedCount =
+    booking.assignedRooms?.length || 0;
 
-        bookingId: booking.id,
-
-        guestName: booking.guestName,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  const allocationComplete =
+    assignedCount >= booking.roomsRequired;
 
   return (
-    <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-4 text-white">
-      {/* TOP */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-bold">
-            {booking.guestName}
-          </h2>
+    <>
+      {/* ================= CARD ================= */}
+      <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5 text-white transition hover:border-zinc-700">
+        {/* TOP */}
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold tracking-tight">
+              {booking.guestName}
+            </h2>
 
-          <p className="text-sm text-zinc-500">
-            {booking.phone}
-          </p>
+            <p className="mt-1 text-sm text-zinc-500">
+              {booking.phone}
+            </p>
+          </div>
+
+          <div
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              allocationComplete
+                ? "bg-emerald-500/10 text-emerald-400"
+                : "bg-yellow-500/10 text-yellow-400"
+            }`}
+          >
+            {allocationComplete
+              ? "Allocated"
+              : "Pending"}
+          </div>
         </div>
 
-        <div className="rounded-full bg-yellow-500/10 px-3 py-1 text-xs text-yellow-400">
-          Pending
+        {/* INFO */}
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+            <div className="flex items-center gap-2 text-zinc-500">
+              <Users size={15} />
+
+              <p className="text-xs uppercase tracking-wide">
+                Travelers
+              </p>
+            </div>
+
+            <p className="mt-2 text-lg font-semibold">
+              {booking.travelers}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+            <div className="flex items-center gap-2 text-zinc-500">
+              <BedDouble size={15} />
+
+              <p className="text-xs uppercase tracking-wide">
+                Rooms
+              </p>
+            </div>
+
+            <p className="mt-2 text-lg font-semibold">
+              {assignedCount}
+              {" / "}
+              {booking.roomsRequired}
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* DETAILS */}
-      <div className="mt-4 space-y-2 text-sm text-zinc-400">
-        <p>
-          Check-In:{" "}
-          {booking.checkInDate}
-        </p>
+        {/* PROGRESS */}
+        <div className="mt-5">
+          <div className="mb-2 flex items-center justify-between text-sm">
+            <p className="text-zinc-500">
+              Room Allocation
+            </p>
 
-        <p>
-          Travelers:{" "}
-          {booking.travelers}
-        </p>
-      </div>
+            <p className="font-medium text-white">
+              {Math.round(
+                (assignedCount /
+                  booking.roomsRequired) *
+                  100
+              )}
+              %
+            </p>
+          </div>
 
-      {/* AVAILABLE ROOMS */}
-      <div className="mt-5">
-        <p className="mb-3 text-sm text-zinc-500">
-          Assign Room
-        </p>
-
-        <div className="flex flex-wrap gap-2">
-          {rooms.map((room) => (
-            <button
-              key={room.id}
-              onClick={() =>
-                handleAssign(room.id)
-              }
-              className="rounded-2xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-black"
-            >
-              {room.roomNumber}
-            </button>
-          ))}
+          <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
+            <div
+              className={`h-full rounded-full transition-all ${
+                allocationComplete
+                  ? "bg-emerald-500"
+                  : "bg-yellow-500"
+              }`}
+              style={{
+                width: `${
+                  (assignedCount /
+                    booking.roomsRequired) *
+                  100
+                }%`,
+              }}
+            />
+          </div>
         </div>
+
+        {/* ASSIGNED ROOMS */}
+        {booking.assignedRooms?.length >
+          0 && (
+          <div className="mt-5">
+            <p className="mb-3 text-xs uppercase tracking-[0.2em] text-zinc-500">
+              Assigned Rooms
+            </p>
+
+            <div className="flex flex-wrap gap-2">
+              {booking.assignedRooms.map(
+                (room) => (
+                  <div
+                    key={room.roomId}
+                    className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-400"
+                  >
+                    {room.roomNumber}
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        )}
+
+
+        <button
+          onClick={() =>
+            setOpenAllocation(true)
+          }
+          className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-white font-semibold text-black transition hover:opacity-90"
+        >
+          {allocationComplete
+            ? "Manage Allocation"
+            : "Allocate Rooms"}
+
+          <ChevronRight size={18} />
+        </button>
       </div>
-    </div>
+
+      {/* ================= MODAL ================= */}
+      {openAllocation && (
+        <RoomAllocationModal
+          booking={booking}
+          onClose={() =>
+            setOpenAllocation(false)
+          }
+        />
+      )}
+    </>
   );
 }

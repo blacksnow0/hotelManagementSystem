@@ -5,22 +5,17 @@ import {
   query,
   updateDoc,
   where,
-  getDoc
+  getDoc,
+  addDoc,
+  arrayUnion,
 } from "firebase/firestore";
 
 import { db } from "../firebase/firebase";
 
-
-export function listenToRooms(
-  hotelId,
-  callback
-) {
+export function listenToRooms(hotelId, callback) {
   const roomsRef = collection(db, "rooms");
 
-  const q = query(
-    roomsRef,
-    where("hotelId", "==", hotelId)
-  );
+  const q = query(roomsRef, where("hotelId", "==", hotelId));
 
   return onSnapshot(q, (snapshot) => {
     const rooms = snapshot.docs.map((doc) => ({
@@ -32,11 +27,7 @@ export function listenToRooms(
   });
 }
 
-
-export async function updateRoomStatus(
-  roomId,
-  status
-) {
+export async function updateRoomStatus(roomId, status) {
   const roomRef = doc(db, "rooms", roomId);
 
   await updateDoc(roomRef, {
@@ -44,21 +35,15 @@ export async function updateRoomStatus(
   });
 }
 
-
-export async function checkOutRoom(
-  roomId
-) {
+export async function checkOutRoom(roomId) {
   const roomRef = doc(db, "rooms", roomId);
 
   /* GET CURRENT ROOM */
-  const roomSnap = await getDoc(
-    roomRef
-  );
+  const roomSnap = await getDoc(roomRef);
 
   const roomData = roomSnap.data();
 
-  const bookingId =
-    roomData.currentBookingId;
+  const bookingId = roomData.currentBookingId;
 
   /* UPDATE ROOM */
   await updateDoc(roomRef, {
@@ -71,11 +56,7 @@ export async function checkOutRoom(
 
   /* UPDATE BOOKING */
   if (bookingId) {
-    const bookingRef = doc(
-      db,
-      "bookings",
-      bookingId
-    );
+    const bookingRef = doc(db, "bookings", bookingId);
 
     await updateDoc(bookingRef, {
       status: "completed",
@@ -83,10 +64,7 @@ export async function checkOutRoom(
   }
 }
 
-
-export async function markRoomClean(
-  roomId
-) {
+export async function markRoomClean(roomId) {
   const roomRef = doc(db, "rooms", roomId);
 
   await updateDoc(roomRef, {
@@ -94,12 +72,49 @@ export async function markRoomClean(
   });
 }
 
+// export async function assignRoom({
+//   roomId,
+//   bookingId,
+//   guestName,
+// }) {
+//   const roomRef = doc(db, "rooms", roomId);
+
+//   const bookingRef = doc(
+//     db,
+//     "bookings",
+//     bookingId
+//   );
+
+//   /* ROOM RESERVED */
+//   await updateDoc(roomRef, {
+//     status: "reserved",
+
+//     currentBookingId: bookingId,
+
+//     currentGuestName: guestName,
+//   });
+
+//   /* BOOKING ASSIGNED */
+//   await updateDoc(bookingRef, {
+//     status: "assigned",
+
+//     assignedRoomId: roomId,
+//   });
+// }
+
 export async function assignRoom({
   roomId,
   bookingId,
   guestName,
 }) {
-  const roomRef = doc(db, "rooms", roomId);
+  /* ===============================
+     REFS
+  =============================== */
+  const roomRef = doc(
+    db,
+    "rooms",
+    roomId
+  );
 
   const bookingRef = doc(
     db,
@@ -107,7 +122,50 @@ export async function assignRoom({
     bookingId
   );
 
-  /* ROOM RESERVED */
+  /* ===============================
+     FETCH DATA
+  =============================== */
+  const bookingSnap =
+    await getDoc(bookingRef);
+
+  const roomSnap =
+    await getDoc(roomRef);
+
+  const bookingData =
+    bookingSnap.data();
+
+  const roomData = roomSnap.data();
+
+  /* ===============================
+     VALIDATION
+  =============================== */
+  if (
+    bookingData.assignedRooms
+      ?.length >=
+    bookingData.roomsRequired
+  ) {
+    throw new Error(
+      "All required rooms already assigned"
+    );
+  }
+
+  /* ===============================
+     ROOM SNAPSHOT
+  =============================== */
+  const roomPayload = {
+    roomId,
+
+    roomNumber:
+      roomData.roomNumber,
+
+    floor: roomData.floor,
+
+    type: roomData.type,
+  };
+
+  /* ===============================
+     UPDATE ROOM
+  =============================== */
   await updateDoc(roomRef, {
     status: "reserved",
 
@@ -116,25 +174,109 @@ export async function assignRoom({
     currentGuestName: guestName,
   });
 
-  /* BOOKING ASSIGNED */
+  /* ===============================
+     UPDATE BOOKING
+  =============================== */
   await updateDoc(bookingRef, {
-    status: "assigned",
-
-    assignedRoomId: roomId,
+    assignedRooms:
+      arrayUnion(roomPayload),
   });
 }
 
-export async function checkInRoom(
-  roomId,
-  bookingId
-) {
-  const roomRef = doc(db, "rooms", roomId);
 
+export async function updateBookingAllocation({
+  bookingId,
+  selectedRooms,
+  guestName,
+}) {
+  /* ===============================
+     BOOKING REF
+  =============================== */
   const bookingRef = doc(
     db,
     "bookings",
     bookingId
   );
+
+  const bookingSnap =
+    await getDoc(bookingRef);
+
+  const bookingData =
+    bookingSnap.data();
+
+  const currentAssignedRooms =
+    bookingData.assignedRooms || [];
+
+  /* ===============================
+     CALCULATE DIFF
+  =============================== */
+
+  /* ROOMS TO REMOVE */
+  const roomsToRemove =
+    currentAssignedRooms.filter(
+      (roomId) =>
+        !selectedRooms.includes(roomId)
+    );
+
+  /* ROOMS TO ADD */
+  const roomsToAdd =
+    selectedRooms.filter(
+      (roomId) =>
+        !currentAssignedRooms.includes(
+          roomId
+        )
+    );
+
+  /* ===============================
+     REMOVE OLD ROOMS
+  =============================== */
+  for (const roomId of roomsToRemove) {
+    const roomRef = doc(
+      db,
+      "rooms",
+      roomId
+    );
+
+    await updateDoc(roomRef, {
+      status: "available",
+
+      currentBookingId: null,
+
+      currentGuestName: null,
+    });
+  }
+
+  /* ===============================
+     ASSIGN NEW ROOMS
+  =============================== */
+  for (const roomId of roomsToAdd) {
+    const roomRef = doc(
+      db,
+      "rooms",
+      roomId
+    );
+
+    await updateDoc(roomRef, {
+      status: "reserved",
+
+      currentBookingId: bookingId,
+
+      currentGuestName: guestName,
+    });
+  }
+
+  /* ===============================
+     UPDATE BOOKING
+  =============================== */
+  await updateDoc(bookingRef, {
+    assignedRooms: selectedRooms,
+  });
+}
+
+export async function checkInRoom(roomId, bookingId) {
+  const roomRef = doc(db, "rooms", roomId);
+
+  const bookingRef = doc(db, "bookings", bookingId);
 
   /* ROOM OCCUPIED */
   await updateDoc(roomRef, {
@@ -145,33 +287,23 @@ export async function checkInRoom(
   await updateDoc(bookingRef, {
     status: "checked_in",
   });
+
+  await updateDoc(bookingRef, {
+    assignedRooms: arrayUnion(roomId),
+  });
 }
 
-export async function shiftRoom({
-  oldRoomId,
-  newRoomId,
-}) {
+export async function shiftRoom({ oldRoomId, newRoomId }) {
   /* OLD ROOM */
-  const oldRoomRef = doc(
-    db,
-    "rooms",
-    oldRoomId
-  );
+  const oldRoomRef = doc(db, "rooms", oldRoomId);
 
   /* GET CURRENT DATA */
-  const oldRoomSnap = await getDoc(
-    oldRoomRef
-  );
+  const oldRoomSnap = await getDoc(oldRoomRef);
 
-  const oldRoomData =
-    oldRoomSnap.data();
+  const oldRoomData = oldRoomSnap.data();
 
   /* NEW ROOM */
-  const newRoomRef = doc(
-    db,
-    "rooms",
-    newRoomId
-  );
+  const newRoomRef = doc(db, "rooms", newRoomId);
 
   /* CLEAR OLD ROOM */
   await updateDoc(oldRoomRef, {
@@ -186,10 +318,45 @@ export async function shiftRoom({
   await updateDoc(newRoomRef, {
     status: "occupied",
 
-    currentBookingId:
-      oldRoomData.currentBookingId,
+    currentBookingId: oldRoomData.currentBookingId,
 
-    currentGuestName:
-      oldRoomData.currentGuestName,
+    currentGuestName: oldRoomData.currentGuestName,
   });
+}
+
+export async function createRooms({
+  hotelId,
+  floor,
+  startRoom,
+  endRoom,
+  capacity,
+  type,
+}) {
+  const roomsRef = collection(db, "rooms");
+
+  const roomPromises = [];
+
+  for (let roomNumber = startRoom; roomNumber <= endRoom; roomNumber++) {
+    roomPromises.push(
+      addDoc(roomsRef, {
+        hotelId,
+
+        floor,
+
+        roomNumber: roomNumber.toString(),
+
+        capacity,
+
+        type,
+
+        status: "available",
+
+        currentBookingId: null,
+
+        currentGuestName: "",
+      }),
+    );
+  }
+
+  await Promise.all(roomPromises);
 }

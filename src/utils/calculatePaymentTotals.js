@@ -1,6 +1,6 @@
 export default function calculatePaymentTotals(
   payments = [],
-  totalAmount = 0
+  totalAmount = 0,
 ) {
   const receivedAmount =
     payments.reduce(

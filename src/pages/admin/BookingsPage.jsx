@@ -20,9 +20,11 @@ export default function BookingsPage() {
     checkInDate: "",
     checkOutDate: "",
     travelers: 1,
+    roomsRequired: 1,
     bookingSource: "",
     totalAmount: "",
     advanceAmount: "",
+    assignedRooms: [],
     notes: "",
   });
 
@@ -31,9 +33,11 @@ export default function BookingsPage() {
   const totalSteps = 4;
 
   function handleChange(e) {
+    const { name, value, type } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: type === "number" ? Number(value) : value,
     });
   }
 
@@ -50,6 +54,7 @@ export default function BookingsPage() {
   }
 
   async function handleSubmit() {
+
     try {
       setLoading(true);
 
@@ -64,6 +69,7 @@ export default function BookingsPage() {
         checkInDate: "",
         checkOutDate: "",
         travelers: 1,
+        roomsRequired: 1,
         bookingSource: "",
         totalAmount: "",
         advanceAmount: "",
@@ -83,7 +89,6 @@ export default function BookingsPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      {/* ================= MOBILE ================= */}
       {/* ================= MOBILE ================= */}
       <div className="lg:hidden">
         <div className="min-h-screen bg-zinc-950 text-white">
@@ -395,6 +400,16 @@ export default function BookingsPage() {
                   name="travelers"
                   placeholder="Travelers"
                   value={formData.travelers}
+                  onChange={handleChange}
+                  className={inputClass}
+                />
+
+                <input
+                  type="number"
+                  min="1"
+                  name="roomsRequired"
+                  placeholder="Rooms Required"
+                  value={formData.roomsRequired}
                   onChange={handleChange}
                   className={inputClass}
                 />

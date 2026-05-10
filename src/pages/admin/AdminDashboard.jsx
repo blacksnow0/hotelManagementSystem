@@ -4,6 +4,7 @@ import {
   Wallet,
   AlertCircle,
 } from "lucide-react";
+import getTodayDate from "../../utils/getTodayDate";
 
 export default function AdminDashboard() {
   const stats = [
@@ -58,16 +59,32 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8">
       {/* PAGE HEADER */}
-      <div>
-        <h1 className="text-3xl font-bold text-white">
-          Admin Dashboard
-        </h1>
+<div className="flex flex-col gap-4 rounded-3xl border border-zinc-800 bg-zinc-900/60 p-5 md:flex-row md:items-center md:justify-between md:p-7">
+  {/* LEFT */}
+  <div>
+    <h1 className="text-2xl font-bold tracking-tight text-white md:text-4xl">
+      Admin Dashboard
+    </h1>
 
-        <p className="mt-2 text-sm text-zinc-500">
-          Monitor bookings, hotels and
-          financial operations
-        </p>
+    <p className="mt-2 max-w-xl text-sm leading-relaxed text-zinc-500 md:text-base">
+      Monitor bookings, hotels and
+      financial operations
+    </p>
+  </div>
+
+  {/* RIGHT */}
+  <div className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 md:min-w-[220px] md:justify-center md:px-6">
+    <div className="md:text-center">
+      <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">
+        Today
+      </p>
+
+      <div className="mt-1 text-sm font-semibold text-white md:text-xl">
+        {getTodayDate()}
       </div>
+    </div>
+  </div>
+</div>
 
       {/* STATS */}
       <section>

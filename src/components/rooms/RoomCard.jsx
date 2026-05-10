@@ -1,4 +1,4 @@
-import {
+  import {
   checkOutRoom,
   markRoomClean,
   checkInRoom,
@@ -40,6 +40,22 @@ export default function RoomCard({ room }) {
 
           <h2 className="text-2xl font-bold">{room.roomNumber}</h2>
         </div>
+
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+  <span>
+    Floor {room.floor}
+  </span>
+
+  <span>•</span>
+
+  <span>
+    {room.capacity} Guests
+  </span>
+
+  <span>•</span>
+
+  <span>{room.type}</span>
+</div>
 
         <div className="rounded-full bg-zinc-800 px-3 py-1 text-sm capitalize">
           {room.status}

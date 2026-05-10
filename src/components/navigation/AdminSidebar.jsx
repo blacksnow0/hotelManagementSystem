@@ -28,7 +28,7 @@ export default function AdminSidebar() {
   ];
 
   return (
-    <aside className="hidden w-64 border-r border-zinc-800 bg-zinc-950 lg:flex lg:flex-col">
+    <aside className="hidden sticky top-0 h-screen w-64 border-r border-zinc-800 bg-zinc-950 lg:flex lg:flex-col">
       {/* HEADER */}
       <div className="border-b border-zinc-800 p-6">
         <h1 className="text-2xl font-bold text-white">
