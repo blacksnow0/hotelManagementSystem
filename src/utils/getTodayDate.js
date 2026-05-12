@@ -1,5 +1,13 @@
-export default function getTodayDate() {
-  const today = new Date();
+export default function getTodayDate(
+  offset = 0
+) {
+  const date = new Date();
 
-  return today.toISOString().split("T")[0];
+  date.setDate(
+    date.getDate() + offset
+  );
+
+  return date
+    .toISOString()
+    .split("T")[0];
 }

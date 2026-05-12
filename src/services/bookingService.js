@@ -59,8 +59,10 @@ export function listenToHotelBookings(
   hotelId,
   callback
 ) {
+  const today = getTodayDate(0);
 
-  const today = getTodayDate();
+  const tomorrow =
+    getTodayDate(1);
 
   const bookingsRef = collection(
     db,
@@ -77,11 +79,20 @@ export function listenToHotelBookings(
       "==",
       "pending_assignment"
     ),
+
     where(
       "checkInDate",
-      "==",
+      ">=",
       today
     ),
+
+    where(
+      "checkInDate",
+      "<=",
+      tomorrow
+    ),
+
+    orderBy("checkInDate"),
 
     orderBy("createdAt", "desc")
   );
