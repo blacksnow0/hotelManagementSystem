@@ -5,7 +5,6 @@ import {
 
 import {
   X,
-  Check,
   BedDouble,
   Building2,
 } from "lucide-react";
@@ -200,54 +199,56 @@ export default function RoomAllocationModal({
         </div>
 
         {/* ================= SELECTED ROOMS ================= */}
-        <div className="sticky top-[145px] z-10 border-b border-zinc-800 bg-zinc-950/95 px-6 py-4 backdrop-blur">
-          <div className="flex items-center gap-2">
-            <Check
-              size={16}
-              className="text-emerald-400"
-            />
+        <div className="sticky top-[125px] z-10 border-b border-zinc-800 bg-zinc-950/95 px-6 py-4 backdrop-blur">
+  <div className="flex items-center justify-between">
+    <div>
+      <p className="text-sm font-medium text-zinc-300">
+        Selected Rooms
+      </p>
 
-            <p className="text-sm font-medium text-zinc-300">
-              Selected Rooms
-            </p>
-          </div>
+      <p className="text-xs text-zinc-500">
+        {selectedRooms.length} selected
+      </p>
+    </div>
 
-          {selectedRooms.length === 0 ? (
-            <p className="mt-3 text-sm text-zinc-500">
-              No rooms selected yet
-            </p>
-          ) : (
-            <div className="mt-4 flex flex-wrap gap-3">
-              {selectedRooms.map(
-                (roomId) => {
-                  const room = rooms.find(
-                    (r) => r.id === roomId
-                  );
+    {selectedRooms.length > 0 && (
+      <button
+        onClick={() =>
+          setSelectedRooms([])
+        }
+        className="text-xs text-red-400"
+      >
+        Clear All
+      </button>
+    )}
+  </div>
 
-                  return (
-                    <button
-                      key={roomId}
-                      onClick={() =>
-                        handleRoomToggle(
-                          roomId
-                        )
-                      }
-                      className="flex items-center gap-2 rounded-2xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-black"
-                    >
-                      <BedDouble size={16} />
+  {selectedRooms.length > 0 && (
+    <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+      {selectedRooms.map((roomId) => {
+        const room = rooms.find(
+          (r) => r.id === roomId
+        );
 
-                      {
-                        room?.roomNumber
-                      }
+        return (
+          <button
+            key={roomId}
+            onClick={() =>
+              handleRoomToggle(roomId)
+            }
+            className="flex shrink-0 items-center gap-2 rounded-xl bg-emerald-500/15 px-3 py-2 text-sm font-medium text-emerald-400"
+          >
+            <BedDouble size={14} />
 
-                      <X size={14} />
-                    </button>
-                  );
-                }
-              )}
-            </div>
-          )}
-        </div>
+            {room?.roomNumber}
+
+            <X size={12} />
+          </button>
+        );
+      })}
+    </div>
+  )}
+</div>
 
         {/* ================= FLOOR ROOMS ================= */}
         <div className="flex-1 overflow-y-auto p-6">

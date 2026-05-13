@@ -26,7 +26,7 @@ export default function DashboardStats({
       {/* OCCUPIED */}
       <div className="rounded-3xl bg-zinc-900 p-4 text-white">
         <p className="text-sm text-zinc-500">
-          Occupied
+          OCCUPIED ROOMS
         </p>
 
         <h2 className="mt-2 text-3xl font-bold">
@@ -37,7 +37,7 @@ export default function DashboardStats({
       {/* AVAILABLE */}
       <div className="rounded-3xl bg-zinc-900 p-4 text-white">
         <p className="text-sm text-zinc-500">
-          Available
+          AVAILABLE ROOMS
         </p>
 
         <h2 className="mt-2 text-3xl font-bold">
@@ -48,7 +48,7 @@ export default function DashboardStats({
       {/* CLEANING */}
       <div className="rounded-3xl bg-zinc-900 p-4 text-white">
         <p className="text-sm text-zinc-500">
-          Cleaning
+          CLEANING
         </p>
 
         <h2 className="mt-2 text-3xl font-bold">
@@ -59,7 +59,7 @@ export default function DashboardStats({
       {/* PENDING */}
       <div className="rounded-3xl bg-zinc-900 p-4 text-white">
         <p className="text-sm text-zinc-500">
-          Pending
+          PENDING BOOKINGS
         </p>
 
         <h2 className="mt-2 text-3xl font-bold">

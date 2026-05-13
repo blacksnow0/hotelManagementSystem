@@ -293,6 +293,33 @@ export async function checkInRoom(roomId, bookingId) {
   });
 }
 
+export async function checkInRooms(roomIds, bookingId) {
+  try {
+    /* UPDATE ALL ROOMS */
+    const roomPromises = roomIds.map((roomId) => {
+      const roomRef = doc(db, "rooms", roomId);
+
+      return updateDoc(roomRef, {
+        status: "occupied",
+      });
+    });
+
+    await Promise.all(roomPromises);
+
+    /* UPDATE BOOKING */
+    const bookingRef = doc(db, "bookings", bookingId);
+
+    await updateDoc(bookingRef, {
+      status: "checked_in",
+
+    });
+
+    console.log("All rooms checked in successfully");
+  } catch (error) {
+    console.error("Check-in failed:", error);
+  }
+}
+
 export async function shiftRoom({ oldRoomId, newRoomId }) {
   /* OLD ROOM */
   const oldRoomRef = doc(db, "rooms", oldRoomId);
@@ -324,39 +351,79 @@ export async function shiftRoom({ oldRoomId, newRoomId }) {
   });
 }
 
-export async function createRooms({
-  hotelId,
-  floor,
-  startRoom,
-  endRoom,
-  capacity,
-  type,
-}) {
-  const roomsRef = collection(db, "rooms");
+// export async function createRooms({
+//   hotelId,
+//   floor,
+//   startRoom,
+//   endRoom,
+//   capacity,
+//   type,
+// }) {
+//   const roomsRef = collection(db, "rooms");
 
-  const roomPromises = [];
+//   const roomPromises = [];
 
-  for (let roomNumber = startRoom; roomNumber <= endRoom; roomNumber++) {
-    roomPromises.push(
-      addDoc(roomsRef, {
-        hotelId,
+//   for (let roomNumber = startRoom; roomNumber <= endRoom; roomNumber++) {
+//     roomPromises.push(
+//       addDoc(roomsRef, {
+//         hotelId,
 
-        floor,
+//         floor,
 
-        roomNumber: roomNumber.toString(),
+//         roomNumber: roomNumber.toString(),
 
-        capacity,
+//         capacity,
 
-        type,
+//         type,
 
-        status: "available",
+//         status: "available",
 
-        currentBookingId: null,
+//         currentBookingId: null,
 
-        currentGuestName: "",
-      }),
+//         currentGuestName: "",
+//       }),
+//     );
+//   }
+
+//   await Promise.all(roomPromises);
+// }
+
+
+export async function createRooms(
+  rooms = []
+) {
+  try {
+    const promises = rooms.map(
+      (room) => {
+        return addDoc(
+          collection(db, "rooms"),
+          {
+            hotelId: room.hotelId,
+
+            floor: room.floor,
+
+            roomNumber:
+              room.roomNumber,
+
+            capacity:
+              room.capacity,
+
+            type: room.type,
+
+            status: "available",
+
+            currentBookingId: null,
+
+            currentGuestName: "",
+          }
+        );
+      }
     );
-  }
 
-  await Promise.all(roomPromises);
+    await Promise.all(promises);
+  } catch (error) {
+    console.error(error);
+
+    throw error;
+  }
 }

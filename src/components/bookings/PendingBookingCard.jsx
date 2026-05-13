@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import {
-  BedDouble,
   ChevronRight,
   ChevronDown,
   Users,
@@ -14,13 +13,23 @@ import {
 
 import RoomAllocationModal from "./RoomAllocationModal";
 
+import { checkInRooms } from "../../services/roomService";
+
+import { useNavigate } from "react-router-dom";
+
 export default function PendingBookingCard({
   booking,
 }) {
+
+  const navigate = useNavigate()
+
   const [openAllocation, setOpenAllocation] =
     useState(false);
 
   const [showDetails, setShowDetails] =
+    useState(false);
+
+  const [loading, setLoading] =
     useState(false);
 
   const assignedCount =
@@ -33,6 +42,38 @@ export default function PendingBookingCard({
     (assignedCount /
       booking.roomsRequired) *
     100;
+
+  async function handlePrimaryAction() {
+    try {
+      /* OPEN ALLOCATION */
+      if (!allocationComplete) {
+        setOpenAllocation(true);
+
+        return;
+      }
+
+      /* CHECK IN ALL ROOMS */
+      setLoading(true);
+
+      console.log("working and button clicked")
+
+      const roomIds =
+        booking.assignedRooms.map(
+          (room) => room.roomId
+        );
+
+      await checkInRooms(
+        roomIds,
+        booking.id
+      );
+
+      navigate("/manager/current")
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <>
@@ -132,15 +173,18 @@ export default function PendingBookingCard({
 
           {/* ================= ACTIONS ================= */}
           <div className="mt-5 flex gap-3">
-            {/* ALLOCATE BUTTON */}
+            {/* PRIMARY BUTTON */}
             <button
-              onClick={() =>
-                setOpenAllocation(true)
+              onClick={
+                handlePrimaryAction
               }
-              className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-white font-semibold text-black transition hover:opacity-90"
+              disabled={loading}
+              className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-white font-semibold text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {allocationComplete
-                ? "Manage"
+              {loading
+                ? "Processing..."
+                : allocationComplete
+                ? "CheckIn"
                 : "Allocate"}
 
               <ChevronRight size={18} />

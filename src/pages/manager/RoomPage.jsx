@@ -12,6 +12,7 @@ export default function RoomsPage() {
   const { rooms } = useRooms(currentUser?.hotelId);
 
   const [roomFilter, setRoomFilter] = useState("all");
+  
 
   const filteredRooms = useMemo(() => {
     if (roomFilter === "all") {

@@ -10,14 +10,14 @@ export default function BottomNav() {
       path: "/manager",
     },
     {
-      label: "Rooms",
+      label: "Arrivals",
       icon: BedDouble,
-      path: "/manager/rooms",
+      path: "/manager/arrival",
     },
     {
-      label: "Cleaning",
+      label: "Current",
       icon: Sparkles,
-      path: "/manager/cleaning",
+      path: "/manager/current",
     },
     {
       label: "Profile",

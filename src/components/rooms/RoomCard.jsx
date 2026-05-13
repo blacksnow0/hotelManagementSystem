@@ -4,12 +4,12 @@ import {
   checkInRoom,
 } from "../../services/roomService";
 
-import { useState } from "react";
+// import { useState } from "react";
 
-import ShiftRoomModal from "./ShiftRoomModal";
+// import ShiftRoomModal from "./ShiftRoomModal";
 
 export default function RoomCard({ room }) {
-  const [showShiftModal, setShowShiftModal] = useState(false);
+  // const [showShiftModal, setShowShiftModal] = useState(false);
 
   async function handleAction() {
     try {
@@ -82,14 +82,14 @@ export default function RoomCard({ room }) {
         </button>
       )}
 
-      {room.status === "occupied" && (
+      {/* {room.status === "occupied" && (
         <button
           onClick={() => setShowShiftModal(true)}
           className="mt-3 w-full rounded-2xl bg-zinc-800 py-3 font-semibold text-white"
         >
           Shift Room
         </button>
-      )}
+      )} */}
 
       {room.status === "cleaning" && (
         <button
@@ -100,9 +100,9 @@ export default function RoomCard({ room }) {
         </button>
       )}
 
-      {showShiftModal && (
+      {/* {showShiftModal && (
         <ShiftRoomModal room={room} onClose={() => setShowShiftModal(false)} />
-      )}
+      )} */}
 
       {room.status === "available" && (
         <div className="mt-5 rounded-2xl bg-emerald-500/10 py-3 text-center text-sm text-emerald-400">

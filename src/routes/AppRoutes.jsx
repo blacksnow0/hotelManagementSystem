@@ -22,6 +22,8 @@ import CleaningPage from "../pages/manager/CleaningPage";
 
 import ProfilePage from "../pages/manager/ProfilePage";
 import RoomGeneratorPage from "../pages/admin/RoomGeneratorPage";
+import ArrivalPage from "../pages/manager/ArrivalPage";
+import CurrentGuests from "../pages/manager/CurrentGuests";
 
 export default function AppRoutes() {
   return (
@@ -46,6 +48,13 @@ export default function AppRoutes() {
         <Route path="cleaning" element={<CleaningPage />} />
 
         <Route path="profile" element={<ProfilePage />} />
+
+        <Route path="arrival" element={<ArrivalPage />} />
+
+        <Route path="current" element={<CurrentGuests />} />
+
+
+        
       </Route>
 
       {/* ADMIN */}

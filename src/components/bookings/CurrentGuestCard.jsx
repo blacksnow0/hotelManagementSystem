@@ -12,9 +12,11 @@ export default function CurrentGuestCard({ booking }) {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const payments = useBookingPayments(booking.id);
 
+
   const { receivedAmount, pendingAmount } = calculatePaymentTotals(
     payments,
     booking.totalAmount,
+    booking.advanceAmount
   );
   return (
     <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-4 text-white">
@@ -32,14 +34,32 @@ export default function CurrentGuestCard({ booking }) {
       </div>
 
       {/* DETAILS */}
-      <div className="mt-4 space-y-2 text-sm text-zinc-400">
-        <p>Room: {booking.assignedRoomId}</p>
+      <div className="mt-4 space-y-4 text-sm text-zinc-400">
+        {/* ROOMS */}
+        <div>
+          <p className="mb-2 text-xs uppercase tracking-[0.2em] text-zinc-500">
+            Rooms
+          </p>
 
-        <p>Travelers: {booking.travelers}</p>
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {booking.assignedRooms?.map((room) => (
+              <div
+                key={room.roomId}
+                className="shrink-0 rounded-xl border border-blue-500/20 bg-blue-500/10 px-4 py-2 font-medium text-blue-400"
+              >
+                {room.roomNumber}
+              </div>
+            ))}
+          </div>
+        </div>
 
-        <p>Check-Out: {booking.checkOutDate}</p>
+        {/* OTHER INFO */}
+        <div className="space-y-2">
+          <p>Travelers: {booking.travelers}</p>
+
+          <p>Check-Out: {booking.checkOutDate}</p>
+        </div>
       </div>
-
 
       {/* PAYMENT SUMMARY */}
       <div className="mt-5 rounded-2xl bg-zinc-950 p-4">

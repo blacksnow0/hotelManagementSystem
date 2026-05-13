@@ -1,16 +1,31 @@
 export default function calculatePaymentTotals(
   payments = [],
   totalAmount = 0,
+  advanceAmount = 0,
 ) {
-  const receivedAmount =
+  const safeTotalAmount =
+    Number(totalAmount) || 0;
+
+  const safeAdvanceAmount =
+    Number(advanceAmount) || 0;
+
+  /* PAYMENTS ADDED LATER */
+  const paymentAmount =
     payments.reduce(
       (sum, payment) =>
-        sum + Number(payment.amount || 0),
+        sum +
+        Number(payment.amount || 0),
       0
     );
 
+  /* TOTAL RECEIVED */
+  const receivedAmount =
+    safeAdvanceAmount +
+    paymentAmount;
+
+  /* REMAINING */
   const pendingAmount =
-    Number(totalAmount) -
+    safeTotalAmount -
     receivedAmount;
 
   return {

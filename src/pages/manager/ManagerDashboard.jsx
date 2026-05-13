@@ -8,9 +8,9 @@ import useCheckedInBookings from "../../hooks/useCheckedInBookings";
 
 import DashboardStats from "../../components/dashboard/DashboardStats";
 
-import PendingBookingCard from "../../components/bookings/PendingBookingCard";
+// import PendingBookingCard from "../../components/bookings/PendingBookingCard";
 
-import CurrentGuestCard from "../../components/bookings/CurrentGuestCard";
+// import CurrentGuestCard from "../../components/bookings/CurrentGuestCard";
 
 export default function ManagerDashboard() {
   const { currentUser } = useAuth();
@@ -30,16 +30,13 @@ export default function ManagerDashboard() {
     );
 
   return (
-    <div className="min-h-screen bg-zinc-950 p-4 pb-28">
+    <div className="min-h-screen  p-4 pb-28">
       {/* HEADER */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">
-          Hotel Operations
+        <h1 className="text-3xl font-bold">
+          {currentUser?.hotelId}
         </h1>
-
-        <p className="mt-2 text-sm text-zinc-500">
-          Daily overview and activity
-        </p>
+        
       </div>
 
       {/* STATS */}
@@ -54,7 +51,7 @@ export default function ManagerDashboard() {
       />
 
       {/* PENDING ASSIGNMENTS */}
-      <section className="mt-10">
+      {/* <section className="mt-10">
         <h2 className="mb-4 text-2xl font-bold text-white">
           Pending Assignments
         </h2>
@@ -69,10 +66,10 @@ export default function ManagerDashboard() {
             )
           )}
         </div>
-      </section>
+      </section> */}
 
       {/* CURRENT GUESTS */}
-      <section className="mt-10">
+      {/* <section className="mt-10">
         <h2 className="mb-4 text-2xl font-bold text-white">
           Current Guests
         </h2>
@@ -87,7 +84,7 @@ export default function ManagerDashboard() {
             )
           )}
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }
