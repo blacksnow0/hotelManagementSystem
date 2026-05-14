@@ -64,6 +64,54 @@ export async function checkOutRoom(roomId) {
   }
 }
 
+
+export async function checkOutRooms(
+  roomIds = [],
+  bookingId
+) {
+  try {
+    /* ================= UPDATE ALL ROOMS ================= */
+    const roomPromises =
+      roomIds.map(async (roomId) => {
+        const roomRef = doc(
+          db,
+          "rooms",
+          roomId
+        );
+
+        await updateDoc(roomRef, {
+          status: "available",
+
+          currentGuestName: "",
+
+          currentBookingId: null,
+        });
+      });
+
+    await Promise.all(roomPromises);
+
+    /* ================= UPDATE BOOKING ================= */
+    if (bookingId) {
+      const bookingRef = doc(
+        db,
+        "bookings",
+        bookingId
+      );
+
+      await updateDoc(
+        bookingRef,
+        {
+          status: "completed",
+        }
+      );
+    }
+  } catch (error) {
+    console.error(error);
+
+    throw error;
+  }
+}
+
 export async function markRoomClean(roomId) {
   const roomRef = doc(db, "rooms", roomId);
 

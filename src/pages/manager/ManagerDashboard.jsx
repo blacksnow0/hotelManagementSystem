@@ -7,12 +7,64 @@ import useHotelBookings from "../../hooks/useHotelBookings";
 import useCheckedInBookings from "../../hooks/useCheckedInBookings";
 
 import DashboardStats from "../../components/dashboard/DashboardStats";
+import { useState } from "react";
 
-// import PendingBookingCard from "../../components/bookings/PendingBookingCard";
+import BookingForm from "../../components/bookings/BookingForm";
 
-// import CurrentGuestCard from "../../components/bookings/CurrentGuestCard";
+import { createBooking } from "../../services/bookingService";
+
 
 export default function ManagerDashboard() {
+
+  const[loading, setLoading] = useState(false)
+
+  const[formData, setFormData] = useState({
+    guestName: "",
+    phone: "",
+    hotelId: "",
+    checkInDate: "",
+    checkOutDate: "",
+    travelers: "",
+    roomsRequired: 1,
+    bookingSource: "",
+    totalAmount: "",
+    advanceAmount: "",
+    assignedRooms: [],
+    notes: "",
+  })
+
+  async function handleSubmit() {
+      try {
+        setLoading(true);
+  
+        await createBooking({
+          ...formData,
+          createdByRole: "manager",
+        });
+  
+        alert("Booking created");
+  
+        setFormData({
+          guestName: "",
+          phone: "",
+          hotelId: "",
+          checkInDate: "",
+          checkOutDate: "",
+          travelers: 1,
+          roomsRequired: "",
+          bookingSource: "",
+          totalAmount: "",
+          advanceAmount: "",
+          assignedRooms: [],
+          notes: "",
+        });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
   const { currentUser } = useAuth();
 
   const { rooms } = useRooms(
@@ -50,41 +102,14 @@ export default function ManagerDashboard() {
         }
       />
 
-      {/* PENDING ASSIGNMENTS */}
-      {/* <section className="mt-10">
-        <h2 className="mb-4 text-2xl font-bold text-white">
-          Pending Assignments
-        </h2>
-
-        <div className="space-y-4">
-          {pendingBookings.map(
-            (booking) => (
-              <PendingBookingCard
-                key={booking.id}
-                booking={booking}
+      <div className="lg:hidden">
+              <BookingForm
+                formData={formData}
+                setFormData={setFormData}
+                handleSubmit={handleSubmit}
+                loading={loading}
               />
-            )
-          )}
-        </div>
-      </section> */}
-
-      {/* CURRENT GUESTS */}
-      {/* <section className="mt-10">
-        <h2 className="mb-4 text-2xl font-bold text-white">
-          Current Guests
-        </h2>
-
-        <div className="space-y-4">
-          {checkedInBookings.map(
-            (booking) => (
-              <CurrentGuestCard
-                key={booking.id}
-                booking={booking}
-              />
-            )
-          )}
-        </div>
-      </section> */}
+            </div>
     </div>
   );
 }
