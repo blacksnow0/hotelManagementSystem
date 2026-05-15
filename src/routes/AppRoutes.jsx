@@ -24,6 +24,7 @@ import ProfilePage from "../pages/manager/ProfilePage";
 import RoomGeneratorPage from "../pages/admin/RoomGeneratorPage";
 import ArrivalPage from "../pages/manager/ArrivalPage";
 import CurrentGuests from "../pages/manager/CurrentGuests";
+import BookingHistory from "../pages/admin/BookingHistory";
 
 export default function AppRoutes() {
   return (
@@ -70,6 +71,7 @@ export default function AppRoutes() {
         <Route path="bookings" element={<BookingsPage />} />
         <Route path="payments" element={<PaymentsPage />} />
         <Route path="room-generator" element={<RoomGeneratorPage/>}/>
+        <Route path="history" element={<BookingHistory/>}/>
       </Route>
     </Routes>
   );

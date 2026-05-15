@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
-import {
-  listenToBookings,
-} from "../services/bookingService";
+import { listenToBookings } from "../services/bookingService";
 
-export default function useBookings() {
+export default function useBookings(
+  hotelId
+) {
   const [bookings, setBookings] =
     useState([]);
 
@@ -12,15 +12,27 @@ export default function useBookings() {
     useState(true);
 
   useEffect(() => {
-    const unsubscribe =
-      listenToBookings((data) => {
+    if (!hotelId) return;
+
+    async function fetchBookings() {
+      try {
+        setLoading(true);
+
+        const data =
+          await listenToBookings(
+            hotelId
+          );
+
         setBookings(data);
-
+      } catch (error) {
+        console.error(error);
+      } finally {
         setLoading(false);
-      });
+      }
+    }
 
-    return () => unsubscribe();
-  }, []);
+    fetchBookings();
+  }, [hotelId]);
 
   return {
     bookings,

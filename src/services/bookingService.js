@@ -5,7 +5,8 @@ import {
   orderBy,
   query,
   serverTimestamp,
-  where
+  where,
+  getDocs
 } from "firebase/firestore";
 
 import { db } from "../firebase/firebase";
@@ -30,29 +31,38 @@ export async function createBooking(
 }
 
 
-export function listenToBookings(
-  callback
-) {
-  const bookingsRef = collection(
-    db,
-    "bookings"
-  );
-
-  const q = query(
-    bookingsRef,
-    orderBy("createdAt", "desc")
-  );
-
-  return onSnapshot(q, (snapshot) => {
-    const bookings = snapshot.docs.map(
-      (doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })
+export async function listenToBookings() {
+  try {
+    const bookingsRef = collection(
+      db,
+      "bookings"
     );
 
-    callback(bookings);
-  });
+    const q = query(
+      bookingsRef,
+
+      orderBy(
+        "createdAt",
+        "desc"
+      )
+    );
+
+    const snapshot =
+      await getDocs(q);
+
+    const bookings =
+      snapshot.docs.map((doc) => ({
+        id: doc.id,
+
+        ...doc.data(),
+      }));
+
+    return bookings;
+  } catch (error) {
+    console.error(error);
+
+    throw error;
+  }
 }
 
 export function listenToHotelBookings(

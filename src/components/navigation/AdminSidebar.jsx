@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   BookOpen,
   Wallet,
+  HistoryIcon,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -25,7 +26,13 @@ export default function AdminSidebar() {
       icon: Wallet,
       path: "/admin/payments",
     },
+    {
+      label:"History",
+      icon: HistoryIcon,
+      path:"/admin/history"
+    }
   ];
+
 
   return (
     <aside className="hidden sticky top-0 h-screen w-64 border-r border-zinc-800 bg-zinc-950 lg:flex lg:flex-col">

@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   BookOpen,
   Wallet,
+  HistoryIcon,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -25,6 +26,11 @@ export default function AdminBottomNav() {
       icon: Wallet,
       path: "/admin/payments",
     },
+    {
+      label:"History",
+      icon: HistoryIcon,
+      path:"/admin/history"
+    }
   ];
 
   return (

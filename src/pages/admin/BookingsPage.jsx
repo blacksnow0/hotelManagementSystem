@@ -49,7 +49,7 @@ export default function BookingsPage() {
         checkInDate: "",
         checkOutDate: "",
         travelers: 1,
-        roomsRequired: "",
+        roomsRequired: 1,
         bookingSource: "",
         totalAmount: "",
         advanceAmount: "",
